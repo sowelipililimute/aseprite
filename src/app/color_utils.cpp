@@ -49,6 +49,14 @@ gfx::Color color_utils::color_for_ui(const app::Color& color)
   switch (color.getType()) {
     case app::Color::MaskType: c = gfx::ColorNone; break;
 
+    case app::Color::OklabType:
+      c = gfx::rgba(
+        color.getRed(),
+        color.getGreen(),
+        color.getBlue(),
+        color.getAlpha());
+      break;
+
     case app::Color::RgbType:
     case app::Color::HsvType:
     case app::Color::HslType:

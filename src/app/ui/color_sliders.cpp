@@ -104,6 +104,27 @@ public:
                                                                 double(x) / double(w)));
           break;
 
+        case ColorSliders::Channel::OklabLightness:
+          color = color_utils::color_for_ui(
+            app::Color::fromOklab(double(x) / double(w),
+              m_color.getOklabA(),
+              m_color.getOklabB()));
+          break;
+
+        case ColorSliders::Channel::OklabA:
+          color = color_utils::color_for_ui(
+            app::Color::fromOklab(m_color.getOklabLightness(),
+              (0.8 * (double(x) / double(w))) - 0.4,
+              m_color.getOklabB()));
+          break;
+
+        case ColorSliders::Channel::OklabB:
+          color = color_utils::color_for_ui(
+            app::Color::fromOklab(m_color.getOklabLightness(),
+              m_color.getOklabA(),
+              (0.8 * double(x) / double(w)) - 0.4));
+          break;
+
         case ColorSliders::Channel::Gray:
           color = color_utils::color_for_ui(app::Color::fromGray(255 * x / w));
           break;
@@ -254,6 +275,9 @@ ColorSliders::ColorSliders()
   addSlider(Channel::HslLightness, "L", 0, 100, -100, 100);
   addSlider(Channel::Gray, "V", 0, 255, -100, 100);
   addSlider(Channel::Alpha, "A", 0, 255, -100, 100);
+  addSlider(Channel::OklabLightness, "L", 0, 255, -100, 100);
+  addSlider(Channel::OklabA,         "A", 0, 255, -100, 100);
+  addSlider(Channel::OklabB,         "B", 0, 255, -100, 100);
 
   InitTheme.connect([this] { m_grid.setChildSpacing(0); });
 
@@ -299,6 +323,13 @@ void ColorSliders::setColorTypes(const std::vector<app::Color::Type>& types)
         m_items[Channel::HslHue].show = true;
         m_items[Channel::HslSaturation].show = true;
         m_items[Channel::HslLightness].show = true;
+        m_items[Channel::Alpha].show = true;
+        visible = true;
+        break;
+      case app::Color::OklabType:
+        m_items[Channel::OklabLightness].show = true;
+        m_items[Channel::OklabA].show = true;
+        m_items[Channel::OklabB].show = true;
         m_items[Channel::Alpha].show = true;
         visible = true;
         break;
@@ -521,6 +552,9 @@ void ColorSliders::onSetColor(const app::Color& color)
   setAbsSliderValue(Channel::HslLightness, int(color.getHslLightness() * 100.0 + 0.5));
   setAbsSliderValue(Channel::Gray, color.getGray());
   setAbsSliderValue(Channel::Alpha, color.getAlpha());
+  setAbsSliderValue(Channel::OklabLightness, int(color.getOklabLightness() * 255.0));
+  setAbsSliderValue(Channel::OklabA,         int(((color.getOklabA() + 0.4) / 0.8) * 255.0));
+  setAbsSliderValue(Channel::OklabB,         int(((color.getOklabB() + 0.4) / 0.8) * 255.0));
 }
 
 app::Color ColorSliders::getColorFromSliders(const Channel channel) const
@@ -548,6 +582,14 @@ app::Color ColorSliders::getColorFromSliders(const Channel channel) const
                                  getAbsSliderValue(Channel::HslSaturation) / 100.0,
                                  getAbsSliderValue(Channel::HslLightness) / 100.0,
                                  getAbsSliderValue(Channel::Alpha));
+    case Channel::OklabLightness:
+    case Channel::OklabA:
+    case Channel::OklabB:
+      return app::Color::fromOklab(
+        getAbsSliderValue(Channel::OklabLightness) / 255.0,
+        ((0.8) * getAbsSliderValue(Channel::OklabA) / 255.0) - 0.4,
+        ((0.8) * getAbsSliderValue(Channel::OklabB) / 255.0) - 0.4,
+        getAbsSliderValue(Channel::Alpha));
     case Channel::Gray:
       return app::Color::fromGray(getAbsSliderValue(Channel::Gray),
                                   getAbsSliderValue(Channel::Alpha));

@@ -43,6 +43,9 @@ public:
     HslLightness,
     Gray,
     Alpha,
+    OklabLightness,
+    OklabA,
+    OklabB,
     Channels
   };
   enum Mode { Absolute, Relative };

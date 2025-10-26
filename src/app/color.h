@@ -32,6 +32,7 @@ public:
     GrayType,
     IndexType,
     TileType,
+    OklabType,
   };
 
   enum HumanReadableString { ShortHumanReadableString, LongHumanReadableString };
@@ -43,6 +44,7 @@ public:
   static Color fromRgb(int r, int g, int b, int a = 255);
   static Color fromHsv(double h, double s, double v, int a = 255); // h=[0,360], s=[0,1], v=[0,1]
   static Color fromHsl(double h, double s, double l, int a = 255); // h=[0,360], s=[0,1], v=[0,1]
+  static Color fromOklab(double l, double a, double b, int alpha = 255); // l=[0,1], a=[0,1], b[0,1]
   static Color fromGray(int g, int a = 255);
   static Color fromIndex(int index);
   static Color fromTile(doc::tile_t tile);
@@ -76,6 +78,9 @@ public:
   int getIndex() const;
   doc::tile_t getTile() const;
   int getAlpha() const;
+  double getOklabLightness() const;
+  double getOklabA() const;
+  double getOklabB() const;
 
   // Setters
   void setAlpha(int alpha);
@@ -104,6 +109,10 @@ private:
     } gray;
     int index;
     doc::tile_t tile;
+    struct {
+      double l, a, b;
+      int alpha;
+    } oklab;
   } m_value;
 };
 

@@ -42,7 +42,7 @@ namespace app {
 using namespace ui;
 using namespace doc;
 
-enum { INDEX_MODE, RGB_MODE, HSV_MODE, HSL_MODE, GRAY_MODE, MASK_MODE, COLOR_MODES };
+enum { INDEX_MODE, RGB_MODE, HSV_MODE, HSL_MODE, GRAY_MODE, MASK_MODE, OKLAB_MODE, COLOR_MODES };
 
 static std::unique_ptr<doc::Palette> g_simplePal(nullptr);
 
@@ -192,6 +192,7 @@ ColorPopup::ColorPopup(const ColorButtonOptions& options)
   m_colorType.addItem("HSL")->setFocusStop(false);
   m_colorType.addItem("Gray")->setFocusStop(false);
   m_colorType.addItem("Mask")->setFocusStop(false);
+  m_colorType.addItem("OKLAB")->setFocusStop(false);
 
   m_topBox.setBorder(gfx::Border(0));
   m_topBox.setChildSpacing(0);
@@ -454,6 +455,11 @@ void ColorPopup::onColorTypeClick()
       break;
     case GRAY_MODE: newColor = app::Color::fromGray(newColor.getGray(), newColor.getAlpha()); break;
     case MASK_MODE: newColor = app::Color::fromMask(); break;
+    case OKLAB_MODE:
+      newColor = app::Color::fromOklab(newColor.getOklabLightness(),
+                                       newColor.getOklabA(),
+                                       newColor.getOklabB());
+      break;
   }
 
   setColorWithSignal(newColor, ChangeType);
@@ -524,6 +530,7 @@ void ColorPopup::selectColorType(app::Color::Type type)
       case app::Color::HslType:  m_colorType.setSelectedItem(HSL_MODE); break;
       case app::Color::GrayType: m_colorType.setSelectedItem(GRAY_MODE); break;
       case app::Color::MaskType: m_colorType.setSelectedItem(MASK_MODE); break;
+      case app::Color::OklabType: m_colorType.setSelectedItem(OKLAB_MODE); break;
     }
   }
 
@@ -536,6 +543,8 @@ void ColorPopup::selectColorType(app::Color::Type type)
     types.push_back(app::Color::HslType);
   if (m_colorType.getItem(GRAY_MODE)->isSelected())
     types.push_back(app::Color::GrayType);
+  if (m_colorType.getItem(OKLAB_MODE)->isSelected())
+    types.push_back(app::Color::OklabType);
   m_sliders.setColorTypes(types);
 
   // Remove focus from hidden RGB/HSV/HSL text entries
